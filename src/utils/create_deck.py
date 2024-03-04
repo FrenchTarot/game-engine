@@ -24,7 +24,7 @@ def create_deck(card_object):
             cards.append(card_object(suit, value))
 
     for value in [
-        Ace,
+        One,
         Two,
         Three,
         Four,

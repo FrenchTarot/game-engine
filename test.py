@@ -1,6 +1,7 @@
 from Game import Game
 from src.classes.Card import Card
 from src.classes.Player import Player
+from src.classes.Score import Score
 from src.classes.Turn import Turn
 from src.types.CardType import *
 from src.types.CardValue import *

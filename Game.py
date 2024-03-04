@@ -88,6 +88,17 @@ class Game:
             turn = self.play_turn()
             print(turn)
 
+        total_score = Score(self.players)
+        for turn in self.set_history:
+            score = turn.compute_score()
+            total_score = total_score + score
+
+        scores = total_score.get_scores()
+        tot = sum([scores[k]["score"] for k in scores])
+        for card in self.dog_cards:
+            print(card, card.get_score())
+            tot += card.get_score()
+        print(tot)
         print("Set ended")
 
     def bidding(self):

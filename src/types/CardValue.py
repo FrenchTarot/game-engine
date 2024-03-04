@@ -1,5 +1,6 @@
 class CardValue:
     rank = None
+    is_oudler = False
 
 
 class Jack(CardValue):
@@ -20,10 +21,16 @@ class King(CardValue):
 
 class Fool(CardValue):
     rank = 0
+    is_oudler = True
 
 
 class Ace(CardValue):
     rank = 1
+
+
+class One(CardValue):
+    rank = 1
+    is_oudler = True
 
 
 class Two(CardValue):
@@ -104,3 +111,4 @@ class Twenty(CardValue):
 
 class TwentyOne(CardValue):
     rank = 21
+    is_oudler = True

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 from src.classes.Card import Card
 from src.classes.Player import Player
 from src.classes.Score import Score
@@ -17,12 +17,15 @@ class Turn:
         self.played_cards.append(card)
 
     def is_turn_finished(self):
-        return len(self.played_cards) == len(self.players)
+        return len(self.played_cards) >= len(self.players)
 
     def get_turn_winner(self):
         potential_winners = list(
             filter(lambda card: card.value != Fool, self.played_cards)
         )
+        if not len(potential_winners):
+            return None
+
         asked_card = potential_winners[0]
 
         potential_winners = list(
@@ -48,8 +51,11 @@ class Turn:
         for card_index, card in enumerate(self.played_cards):
             if card.value == Fool and not last_turn:
                 score.add_score(self.players[card_index], card.get_score())
+                score.add_oudler(self.players[card_index], card)
             else:
                 score.add_score(turn_winner_player, card.get_score())
+                if card.value.is_oudler:
+                    score.add_oudler(turn_winner_player, card)
 
         return score
 

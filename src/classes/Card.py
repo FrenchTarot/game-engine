@@ -23,7 +23,7 @@ class Card:
 
     def get_score(self) -> float:
         if self.type == Trump:
-            if self.value in [Ace, TwentyOne, Fool]:
+            if self.value.is_oudler:
                 return 4.5
             return 0.5
 
@@ -42,11 +42,6 @@ class Card:
         if self.type != Trump:
             return False
         return self.value in [Jack, Knight, Queen, King]
-
-    def is_oudler(self) -> bool:
-        if self.type != Trump:
-            return False
-        return self.value in [Ace, TwentyOne, Fool]
 
     def _check_card_validity(self) -> None:
         if not self.type:
