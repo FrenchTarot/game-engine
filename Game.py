@@ -4,6 +4,7 @@ from src.classes.Card import Card
 from src.classes.Player import Player
 from src.classes.Score import Score
 from src.classes.Turn import Turn
+from src.classes.Viewer import Viewer
 from src.types.CardType import *
 from src.types.CardValue import *
 
@@ -15,6 +16,7 @@ from src.utils.default_distribute import default_distribute
 
 class Game:
     players: List[Player] = []
+    viewers: List[Viewer] = []
     cards: List[Card] = []
     dog_cards: List[Card] = []
     set_history: List[Turn] = []
@@ -40,8 +42,14 @@ class Game:
     def add_player(self, player: Player):
         self.players.append(player)
 
+    def register_viewer(self, viewer: Viewer):
+        self.viewers.append(viewer)
+
     def reset_players(self):
         self.players = []
+
+    def reset_viewers(self):
+        self.viewers = []
 
     def distribute_cards(self):
         self.dog_cards = []
@@ -73,13 +81,13 @@ class Game:
                 "No dealer selected, start a game to select the first dealer"
             )
         self.set_history = []
-        [player.prepare_to_new_set(self.dealer) for player in self.players]
+        self.transmit_info(Viewer.prepare_to_new_set, {"dealer": self.dealer})
         self.distribute_cards()
         if not self.bidding():
             return Score(self.players)
 
         if self.bid.can_take_dog:
-            [player.view_dog(self.dog_cards) for player in self.players]
+            self.transmit_info(Viewer.view_dog, {"dog_cards": self.dog_cards})
             self.dog_cards = self.bid.player.make_dog(self.dog_cards)
 
         total_turn = int((78 - len(self.dog_cards)) / len(self.players))
@@ -100,6 +108,8 @@ class Game:
             tot += card.get_score()
         print(tot)
         print("Set ended")
+        result = {"bid": self.bid}
+        # self.transmit_info(Viewer.set_ended, )
 
     def bidding(self):
         self.bid = None
@@ -113,8 +123,7 @@ class Game:
                 self.bid = player_bid
                 self.bid.player = player
 
-        for player in self.players:
-            player.view_bid(self.bid)
+        self.transmit_info(Viewer.view_bid, {"bid": self.bid})
 
         return self.bid
 
@@ -129,9 +138,15 @@ class Game:
             played_card = player.tell_card_to_play(new_turn.played_cards)
             played_card.played = True
             new_turn.add_played_card(played_card)
-            for player in self.players:
-                player.view_turn(new_turn)
+            self.transmit_info(Viewer.view_turn, {"turn": new_turn})
 
         self.set_history.append(new_turn)
 
         return new_turn
+
+    def transmit_info(self, viewer_fn, fn_args, confidential=False):
+        if not confidential:
+            for player in self.players:
+                viewer_fn(self=player, **fn_args)
+        for viewer in self.viewers:
+            viewer_fn(self=viewer, **fn_args)

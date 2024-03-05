@@ -3,33 +3,23 @@ from src.classes.Bid import Bid, Small
 
 from src.classes.Card import Card
 import random
+from src.classes.Viewer import Viewer
 
 from src.utils.get_playable_cards import get_playable_cards
 
 
-class Player:
+class Player(Viewer):
     def __init__(self, name) -> None:
         self.cards: List[Card] = []
         self.name = name
-
-    def prepare_to_new_game(self, players) -> None:
-        pass
-
-    def prepare_to_new_set(self, dealer) -> None:
-        self.cards = []
+        self.set_dealer = None
 
     def add_card(self, card: Card):
         self.cards.append(card)
         card.set_owner(self)
 
-    def view_dog(self, dog_cards):
-        pass
-
-    def view_turn(self, turn):
-        pass
-
-    def view_bid(self, bid: Bid):
-        pass
+    def prepare_to_new_set(self, dealer) -> None:
+        self.cards = []
 
     def make_dog(self, dog_cards):
         return dog_cards

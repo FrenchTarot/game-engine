@@ -63,8 +63,6 @@ class Turn:
         score = self.compute_score().get_scores()
         str = ""
         for player_index, player in enumerate(self.players):
-            str += (
-                f"{player.name} ({score[player]}) : {self.played_cards[player_index]}\n"
-            )
+            str += f"{player.name} ({score[player]}) : {self.played_cards[player_index] if len(self.played_cards) > player_index else 'not played yet'}\n"
 
         return str
