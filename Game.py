@@ -5,9 +5,11 @@ from src.classes.Player import Player
 from src.classes.Score import Score
 from src.classes.Turn import Turn
 from src.classes.Viewer import Viewer
+from src.consts.CONTRACT import CONTRACT
 from src.types.CardType import *
 from src.types.CardValue import *
 
+import math
 import random
 from src.utils.create_deck import create_deck
 
@@ -96,20 +98,41 @@ class Game:
             turn = self.play_turn()
             print(turn)
 
+        unit_score = self.compute_set_score()
+        return unit_score
+
+    def compute_set_score(self):
+
         total_score = Score(self.players)
         for turn in self.set_history:
             score = turn.compute_score()
             total_score = total_score + score
 
         scores = total_score.get_scores()
-        tot = sum([scores[k]["score"] for k in scores])
-        for card in self.dog_cards:
-            print(card, card.get_score())
-            tot += card.get_score()
-        print(tot)
-        print("Set ended")
-        result = {"bid": self.bid}
-        # self.transmit_info(Viewer.set_ended, )
+
+        taker_score_dict = scores[self.bid.player].copy()
+        if self.bid.dog_score_to_taker:
+            taker_score_dict["score"] += sum(
+                [card.get_score() for card in self.dog_cards]
+            )
+            taker_score_dict["oudlers"] += [
+                card for card in self.dog_cards if card.value.is_oudler
+            ]
+
+        oudlers_count = len(taker_score_dict["oudlers"])
+
+        print(oudlers_count)
+        print(CONTRACT[oudlers_count], taker_score_dict["score"])
+        contract_made = taker_score_dict["score"] >= CONTRACT[oudlers_count]
+
+        if contract_made:
+            taker_score_dict["used_score"] = math.ceil(taker_score_dict["score"])
+        else:
+            taker_score_dict["used_score"] = math.floor(taker_score_dict["score"])
+
+        difference = taker_score_dict["used_score"] - CONTRACT[oudlers_count]
+        contract_score = 25 if contract_made else -25
+        return (difference + contract_score) * self.bid.multiplicator
 
     def bidding(self):
         self.bid = None
