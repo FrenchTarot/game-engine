@@ -1,7 +1,7 @@
 from typing import Dict, List
 from src.classes.Card import Card
 from src.classes.Player import Player
-from src.classes.Score import Score
+from src.classes.Result import Result
 from src.types.CardType import Trump
 from src.types.CardValue import Fool
 
@@ -45,7 +45,7 @@ class Turn:
         return self.players[winner_index]
 
     def compute_score(self, last_turn=False):
-        score = Score(self.players)
+        score = Result(self.players)
 
         turn_winner_player = self.get_turn_winner()
         for card_index, card in enumerate(self.played_cards):

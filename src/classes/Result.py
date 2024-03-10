@@ -1,4 +1,4 @@
-class Score:
+class Result:
     def __init__(self, players) -> None:
         self.player_scores = {player: {"score": 0, "oudlers": []} for player in players}
 
@@ -23,9 +23,9 @@ class Score:
         if len(
             set(self.player_scores.keys()).difference(set(score2.player_scores.keys()))
         ):
-            return BaseException("Score must have same players when adding them")
+            return BaseException("Result must have same players when adding them")
 
-        result = Score(self.player_scores.keys())
+        result = Result(self.player_scores.keys())
         for player in self.player_scores:
             result.add_score(
                 player,

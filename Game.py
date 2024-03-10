@@ -1,8 +1,9 @@
 from typing import List
 from src.classes.Bid import Bid
 from src.classes.Card import Card
+from src.classes.Handful import Handful
 from src.classes.Player import Player
-from src.classes.Score import Score
+from src.classes.Result import Result
 from src.classes.Turn import Turn
 from src.classes.Viewer import Viewer
 from src.consts.CONTRACT import CONTRACT
@@ -25,6 +26,7 @@ class Game:
     game_history = []
     dealer: Player = None
     bid: Bid = None
+    handful: Handful = None
 
     def __init__(self) -> None:
         self.shuffle_method = random.shuffle
@@ -83,19 +85,30 @@ class Game:
                 "No dealer selected, start a game to select the first dealer"
             )
         self.set_history = []
+        self.handful = None
         self.transmit_info(Viewer.prepare_to_new_set, {"dealer": self.dealer})
         self.distribute_cards()
         if not self.bidding():
-            return Score(self.players)
+            return Result(self.players)
 
         if self.bid.can_take_dog:
             self.transmit_info(Viewer.view_dog, {"dog_cards": self.dog_cards})
             self.dog_cards = self.bid.player.make_dog(self.dog_cards)
 
         total_turn = int((78 - len(self.dog_cards)) / len(self.players))
+        players_sequence = (
+            self.players[self.players.index(self.dealer) + 1 :]
+            + self.players[: self.players.index(self.dealer) + 1]
+        )
+
         for turn_number in range(total_turn):
             print(turn_number + 1, "/", total_turn)
-            turn = self.play_turn()
+            turn = self.play_turn(players_sequence, turn_number)
+            turn_winner = turn.get_turn_winner()
+            players_sequence = (
+                self.players[self.players.index(turn_winner) :]
+                + self.players[: self.players.index(turn_winner)]
+            )
             print(turn)
 
         unit_score = self.compute_set_score()
@@ -103,10 +116,16 @@ class Game:
 
     def compute_set_score(self):
 
-        total_score = Score(self.players)
+        total_score = Result(self.players)
         for turn in self.set_history:
             score = turn.compute_score()
             total_score = total_score + score
+
+        one_at_the_end = len([card for card in turn.played_cards if card.value == One])
+        if one_at_the_end:
+            bout_bonus = 10 if turn.get_turn_winner() == self.bid.player else 10
+        else:
+            bout_bonus = 0
 
         scores = total_score.get_scores()
 
@@ -131,8 +150,20 @@ class Game:
             taker_score_dict["used_score"] = math.floor(taker_score_dict["score"])
 
         difference = taker_score_dict["used_score"] - CONTRACT[oudlers_count]
+
         contract_score = 25 if contract_made else -25
-        return (difference + contract_score) * self.bid.multiplicator
+
+        if self.handful:
+            handful_bonus = self.handful.bonus if contract_made else -self.handful.bonus
+        else:
+            handful_bonus = 0
+        slam_bonus = 0
+
+        return (
+            (difference + contract_score + bout_bonus) * self.bid.multiplicator
+            + handful_bonus
+            + slam_bonus
+        )
 
     def bidding(self):
         self.bid = None
@@ -150,14 +181,16 @@ class Game:
 
         return self.bid
 
-    def play_turn(self):
-        players_sequence = (
-            self.players[self.players.index(self.dealer) + 1 :]
-            + self.players[: self.players.index(self.dealer) + 1]
-        )
-
+    def play_turn(self, players_sequence, turn_number):
         new_turn = Turn(players_sequence)
         for player in players_sequence:
+            if turn_number == 0:
+                player_handful = player.tell_handful()
+                if player_handful:
+                    self.handful = player_handful
+                    self.handful.set_player(player)
+                    player_handful.check_handful()
+                    self.transmit_info(Viewer.view_handful, {"handful": player_handful})
             played_card = player.tell_card_to_play(new_turn.played_cards)
             played_card.played = True
             new_turn.add_played_card(played_card)

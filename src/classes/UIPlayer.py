@@ -9,7 +9,7 @@ from src.classes.Viewer import Viewer
 from src.utils.get_playable_cards import get_playable_cards
 
 
-class Player(Viewer):
+class UIPlayer(Viewer):
     def __init__(self, name) -> None:
         self.cards: List[Card] = []
         self.name = name
@@ -21,6 +21,9 @@ class Player(Viewer):
 
     def prepare_to_new_set(self, dealer) -> None:
         self.cards = []
+
+    def prepare_to_new_game(self, players) -> None:
+        print(f"You are playing with {[player.name for player in players]}")
 
     def make_dog(self, dog_cards):
         return dog_cards
@@ -34,5 +37,12 @@ class Player(Viewer):
         return None
 
     def tell_card_to_play(self, current_turn_cards):
+        print("Played cards :")
+        [print(f"{c}") for i, c in enumerate(current_turn_cards)]
         playable_cards = get_playable_cards(self.cards, current_turn_cards)
-        return random.choice(playable_cards)
+        [print(f"#{i} : {c}") for i, c in enumerate(playable_cards)]
+
+        card_index = -1
+        while card_index not in range(len(playable_cards)):
+            card_index = int(input("Select a card to play > "))
+        return playable_cards[card_index]

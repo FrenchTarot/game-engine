@@ -14,6 +14,9 @@ class Viewer:
     def view_bid(self, bid):
         pass
 
+    def view_handful(self, handful):
+        pass
+
     def set_ended(self, set_score, global_score):
         pass
 
