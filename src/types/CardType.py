@@ -3,20 +3,20 @@ class CardType:
 
 
 class Trump(CardType):
-    pass
+    str = "Trump"
 
 
 class Heart(CardType):
-    pass
+    str = "♥"
 
 
 class Club(CardType):
-    pass
+    str = "♣"
 
 
 class Diamond(CardType):
-    pass
+    str = "♦"
 
 
 class Spade(CardType):
-    pass
+    str = "♠"

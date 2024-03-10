@@ -15,6 +15,7 @@ import random
 from src.utils.create_deck import create_deck
 
 from src.utils.default_distribute import default_distribute
+from src.utils.get_playable_cards import get_playable_cards
 
 
 class Game:
@@ -192,6 +193,10 @@ class Game:
                     player_handful.check_handful()
                     self.transmit_info(Viewer.view_handful, {"handful": player_handful})
             played_card = player.tell_card_to_play(new_turn.played_cards)
+            if played_card not in get_playable_cards(
+                player.cards, new_turn.played_cards
+            ):
+                raise BaseException("Player cannot play this card")
             played_card.played = True
             new_turn.add_played_card(played_card)
             self.transmit_info(Viewer.view_turn, {"turn": new_turn})
