@@ -1,9 +1,16 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from src.types.CardType import CardType, Trump
 from src.types.CardValue import *
 
+if TYPE_CHECKING:
+    from src.classes.Player import Player
+
 
 class Card:
-    def __init__(self, type_: CardType, value_: CardValue, player=None) -> None:
+    def __init__(
+        self, type_: CardType, value_: CardValue, player: Player = None
+    ) -> None:
         if type(type_) == str:
             type_ = self._get_type_from_str(type_)
         if type(value_) == str:
@@ -16,9 +23,9 @@ class Card:
         self._check_card_validity()
 
     def __str__(self) -> str:
-        return f"{self.value.str: >4} {self.type.str}"
+        return f"{self.value.str} {self.type.str: <4}"
 
-    def set_owner(self, player):
+    def set_owner(self, player: Player):
         self.owner = player
 
     def get_score(self) -> float:

@@ -1,25 +1,35 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING, List
+
+from src.classes.Card import Card
+
+if TYPE_CHECKING:
+    from src.classes.Player import Player
+    from src.classes.Result import Result
+
+
 class Result:
-    def __init__(self, players) -> None:
+    def __init__(self, players: List[Player]) -> None:
         self.player_scores = {player: {"score": 0, "oudlers": []} for player in players}
 
-    def add_score(self, player, score):
+    def add_score(self, player: Player, score: int):
         self.player_scores[player]["score"] += score
 
-    def add_oudler(self, player, oudler):
+    def add_oudler(self, player: Player, oudler):
         self.player_scores[player]["oudlers"].append(oudler)
 
     def add_scores(self, scores):
         for player in scores:
             self.player_scores[player]["score"] += scores[player]
 
-    def add_oudlers(self, oudlers):
+    def add_oudlers(self, oudlers: List[Card]):
         for player in oudlers:
             self.player_scores[player]["oudlers"].append(oudlers[player])
 
     def get_scores(self):
         return self.player_scores
 
-    def __add__(self, score2):
+    def __add__(self, score2: Result):
         if len(
             set(self.player_scores.keys()).difference(set(score2.player_scores.keys()))
         ):

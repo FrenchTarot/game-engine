@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import List
 from src.classes.Card import Card
 from src.classes.Player import Player
 from src.classes.Result import Result
@@ -7,9 +7,9 @@ from src.types.CardValue import Fool
 
 
 class Turn:
-    def __init__(self, players) -> None:
+    def __init__(self, players: List[Player]) -> None:
         self.played_cards: List[Card] = []
-        self.players: List[Player] = players
+        self.players = players
 
     def add_played_card(self, card: Card):
         if self.is_turn_finished():

@@ -1,16 +1,23 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING, List
 from src.types.CardType import Trump
 from src.types.CardValue import Fool
+
+if TYPE_CHECKING:
+    from src.classes.Player import Player
+    from src.classes.Card import Card
 
 
 class Handful:
     bonus = 0
     shown_cards = []
-    needed_cards = []
+    needed_cards: int
+    player: Player = None
 
-    def __init__(self, shown_cards) -> None:
+    def __init__(self, shown_cards: List[Card]) -> None:
         self.shown_cards = shown_cards
 
-    def set_player(self, player):
+    def set_player(self, player: Player):
         self.player = player
 
     def check_handful(self):

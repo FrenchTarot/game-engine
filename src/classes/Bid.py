@@ -1,8 +1,18 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.classes.Player import Player
+
+
 class Bid:
     can_take_dog = True
     dog_score_to_taker = True
     multiplicator = None
-    player = None
+    player: Player = None
+
+    def __init__(self) -> None:
+        pass
 
     def get_bid_from_str(self, bid):
         available_values = Bid.__subclasses__()
