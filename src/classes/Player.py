@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List
 
+from src.types.CardType import *
+
 if TYPE_CHECKING:
     from src.classes.Player import Player
 
@@ -23,6 +25,13 @@ class Player(Viewer):
     def add_card(self, card: Card):
         self.cards.append(card)
         card.set_owner(self)
+
+    def sort_cards(self):
+        self.cards = sorted(
+            self.cards,
+            key=lambda card: [Spade, Heart, Club, Diamond, Trump].index(card.type) * 100
+            + card.value.rank,
+        )
 
     def prepare_to_new_set(self, dealer: Player) -> None:
         self.cards = []

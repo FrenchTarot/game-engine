@@ -79,6 +79,7 @@ class Game:
         else:
             self.dealer = random.choice(self.players)
         self.game_history = []
+        self.transmit_info(Viewer.prepare_to_new_game, {"players": self.players})
 
     def play_set(self):
         if not self.dealer:
@@ -116,7 +117,6 @@ class Game:
         return unit_score
 
     def compute_set_score(self):
-
         total_score = Result(self.players)
         for turn in self.set_history:
             score = turn.compute_score()
@@ -141,6 +141,7 @@ class Game:
 
         oudlers_count = len(taker_score_dict["oudlers"])
 
+        print(self.bid.player.name)
         print(oudlers_count)
         print(CONTRACT[oudlers_count], taker_score_dict["score"])
         contract_made = taker_score_dict["score"] >= CONTRACT[oudlers_count]
@@ -168,7 +169,11 @@ class Game:
 
     def bidding(self):
         self.bid = None
-        for player in self.players:
+        players_sequence = (
+            self.players[self.players.index(self.dealer) :]
+            + self.players[: self.players.index(self.dealer)]
+        )
+        for player in players_sequence:
             player_bid = player.tell_bid(self.bid)
             if player_bid:
                 if self.bid and player_bid.rank <= self.bid:
@@ -177,6 +182,8 @@ class Game:
                     )
                 self.bid = player_bid
                 self.bid.player = player
+
+        print(self.bid.player.name)
 
         self.transmit_info(Viewer.view_bid, {"bid": self.bid})
 

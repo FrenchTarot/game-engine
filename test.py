@@ -12,5 +12,5 @@ game = Game()
 players = [Player(name) for name in ["Gui", "Seb", "Cricar"]]
 players += [UIPlayer("Stéphane")]
 [game.add_player(player) for player in players]
-game.start_game(players[0])
+game.start_game(players[-2])
 game.play_set()

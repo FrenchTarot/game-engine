@@ -23,7 +23,7 @@ class Card:
         self._check_card_validity()
 
     def __str__(self) -> str:
-        return f"{self.value.str} {self.type.str: <4}"
+        return f"{self.value.str} {self.type.str}"
 
     def set_owner(self, player: Player):
         self.owner = player
