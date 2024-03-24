@@ -1,8 +1,9 @@
-from src.types.CardType import *
-from src.types.CardValue import *
+from src.classes.Card import CardFactory
+from src.classes.CardType import *
+from src.classes.CardValue import *
 
 
-def create_deck(card_object):
+def create_deck(card_factory: CardFactory):
     cards = []
     for suit in [Diamond, Spade, Heart, Club]:
         for value in [
@@ -21,7 +22,7 @@ def create_deck(card_object):
             Queen,
             King,
         ]:
-            cards.append(card_object(suit, value))
+            cards.append(card_factory.from_json({"type": suit, "value": value}))
 
     for value in [
         One,
@@ -47,6 +48,6 @@ def create_deck(card_object):
         TwentyOne,
         Fool,
     ]:
-        cards.append(card_object(Trump, value))
+        cards.append(card_factory.from_json({"type": Trump, "value": value}))
 
     return cards

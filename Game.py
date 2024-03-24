@@ -1,14 +1,14 @@
 from typing import List
 from src.classes.Bid import Bid
-from src.classes.Card import Card
+from src.classes.Card import Card, CardFactory
 from src.classes.Handful import Handful
 from src.classes.Player import Player
 from src.classes.Result import Result
 from src.classes.Turn import Turn
 from src.classes.Viewer import Viewer
 from src.consts.CONTRACT import CONTRACT
-from src.types.CardType import *
-from src.types.CardValue import *
+from src.classes.CardType import *
+from src.classes.CardValue import *
 
 import math
 import random
@@ -19,6 +19,7 @@ from src.utils.get_playable_cards import get_playable_cards
 
 
 class Game:
+    name: None
     players: List[Player] = []
     viewers: List[Viewer] = []
     cards: List[Card] = []
@@ -29,13 +30,14 @@ class Game:
     bid: Bid = None
     handful: Handful = None
 
-    def __init__(self) -> None:
+    def __init__(self, name=None) -> None:
         self.shuffle_method = random.shuffle
         self.distribute_method = default_distribute
         self.init_deck()
+        self.name = name
 
     def init_deck(self):
-        self.cards = create_deck(Card)
+        self.cards = create_deck(CardFactory())
         self.shuffle_method(self.cards)
 
     def check_deck(self):
@@ -49,12 +51,6 @@ class Game:
 
     def register_viewer(self, viewer: Viewer):
         self.viewers.append(viewer)
-
-    def reset_players(self):
-        self.players = []
-
-    def reset_viewers(self):
-        self.viewers = []
 
     def distribute_cards(self):
         self.dog_cards = []
@@ -79,7 +75,7 @@ class Game:
         else:
             self.dealer = random.choice(self.players)
         self.game_history = []
-        self.transmit_info(Viewer.prepare_to_new_game, {"players": self.players})
+        self.transmit_info("prepare_to_new_game", {"players": self.players})
 
     def play_set(self):
         if not self.dealer:
@@ -88,13 +84,13 @@ class Game:
             )
         self.set_history = []
         self.handful = None
-        self.transmit_info(Viewer.prepare_to_new_set, {"dealer": self.dealer})
+        self.transmit_info("prepare_to_new_set", {"dealer": self.dealer})
         self.distribute_cards()
         if not self.bidding():
             return Result(self.players)
 
         if self.bid.can_take_dog:
-            self.transmit_info(Viewer.view_dog, {"dog_cards": self.dog_cards})
+            self.transmit_info("view_dog", {"dog_cards": self.dog_cards})
             self.dog_cards = self.bid.player.make_dog(self.dog_cards)
 
         total_turn = int((78 - len(self.dog_cards)) / len(self.players))
@@ -183,9 +179,7 @@ class Game:
                 self.bid = player_bid
                 self.bid.player = player
 
-        print(self.bid.player.name)
-
-        self.transmit_info(Viewer.view_bid, {"bid": self.bid})
+        self.transmit_info("view_bid", {"bid": self.bid})
 
         return self.bid
 
@@ -198,7 +192,7 @@ class Game:
                     self.handful = player_handful
                     self.handful.set_player(player)
                     player_handful.check_handful()
-                    self.transmit_info(Viewer.view_handful, {"handful": player_handful})
+                    self._info("view_handful", {"handful": player_handful})
             played_card = player.tell_card_to_play(new_turn.played_cards)
             if played_card not in get_playable_cards(
                 player.cards, new_turn.played_cards
@@ -206,7 +200,7 @@ class Game:
                 raise BaseException("Player cannot play this card")
             played_card.played = True
             new_turn.add_played_card(played_card)
-            self.transmit_info(Viewer.view_turn, {"turn": new_turn})
+            self.transmit_info("view_turn", {"turn": new_turn})
 
         self.set_history.append(new_turn)
 
@@ -215,6 +209,6 @@ class Game:
     def transmit_info(self, viewer_fn, fn_args, confidential=False):
         if not confidential:
             for player in self.players:
-                viewer_fn(self=player, **fn_args)
+                player.__getattribute__(viewer_fn)(**fn_args)
         for viewer in self.viewers:
-            viewer_fn(self=viewer, **fn_args)
+            viewer.__getattribute__(viewer_fn)(**fn_args)

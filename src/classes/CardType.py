@@ -1,3 +1,6 @@
+from src.classes.Factory import Factory
+
+
 class CardType:
     pass
 
@@ -20,3 +23,7 @@ class Diamond(CardType):
 
 class Spade(CardType):
     str = "♠"
+
+
+class CardTypeFactory(Factory):
+    available_classes = CardType.__subclasses__()

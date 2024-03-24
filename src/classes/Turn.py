@@ -2,8 +2,8 @@ from typing import List
 from src.classes.Card import Card
 from src.classes.Player import Player
 from src.classes.Result import Result
-from src.types.CardType import Trump
-from src.types.CardValue import Fool
+from src.classes.CardType import Trump
+from src.classes.CardValue import Fool
 
 
 class Turn:

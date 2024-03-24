@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List
-from src.types.CardType import Trump
-from src.types.CardValue import Fool
+from src.classes.CardType import Trump
+from src.classes.CardValue import Fool
 
 if TYPE_CHECKING:
     from src.classes.Player import Player
@@ -9,13 +9,16 @@ if TYPE_CHECKING:
 
 
 class Handful:
-    bonus = 0
-    shown_cards = []
+    name: str = None
+    bonus: int = 0
+    shown_cards: List[Card] = []
     needed_cards: int
     player: Player = None
 
     def __init__(self, shown_cards: List[Card]) -> None:
         self.shown_cards = shown_cards
+
+        self.check_handful()
 
     def set_player(self, player: Player):
         self.player = player
@@ -61,17 +64,27 @@ class Handful:
 
         return True
 
+    def to_json(self):
+        return {
+            "type": self.name,
+            "player": self.player.to_json(),
+            "shown_cards": [card.to_json() for card in self.shown_cards],
+        }
+
 
 class SingleHandful(Handful):
+    name = "singlehandful"
     bonus = 20
     needed_cards = 10
 
 
 class DoubleHandful(Handful):
+    name = "doublehandful"
     bonus = 40
     needed_cards = 13
 
 
 class TripleHandful(Handful):
+    name = "triplehandful"
     bonus = 60
     needed_cards = 15

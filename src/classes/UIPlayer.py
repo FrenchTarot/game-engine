@@ -2,7 +2,7 @@ from typing import List
 from src.classes.Card import Card
 from src.classes.Player import Player
 from src.consts.TERMINAL_GUI import TERMINAL_GUI
-from src.types.CardType import *
+from src.classes.CardType import *
 from src.utils.get_playable_cards import get_playable_cards
 
 

@@ -1,6 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+from src.classes.Factory import Factory
+
+
 if TYPE_CHECKING:
     from src.classes.Player import Player
 
@@ -11,15 +14,8 @@ class Bid:
     multiplicator = None
     player: Player = None
 
-    def __init__(self) -> None:
-        pass
-
-    def get_bid_from_str(self, bid):
-        available_values = Bid.__subclasses__()
-        filtered = [a for a in available_values if a.__name__ == bid]
-        if len(filtered):
-            return filtered[0]
-        raise BaseException(f"Unknown type for str {bid}")
+    def to_json(self):
+        return {"type": self.__class__.__name__}
 
 
 class Small(Bid):
@@ -48,3 +44,7 @@ class GuardAgainst(Bid):
     can_take_dog = False
     dog_score_to_taker = False
     rank = 5
+
+
+class BidFactory(Factory):
+    available_classes = [Small, Push, Guard, GardWithout, GuardAgainst]

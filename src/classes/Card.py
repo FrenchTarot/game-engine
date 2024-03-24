@@ -1,22 +1,21 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
-from src.types.CardType import CardType, Trump
-from src.types.CardValue import *
+from typing import TYPE_CHECKING, Dict
+from src.classes.Factory import Factory
+from src.classes.CardType import CardType, Trump
+from src.classes.CardValue import *
 
 if TYPE_CHECKING:
     from src.classes.Player import Player
 
 
 class Card:
-    def __init__(
-        self, type_: CardType, value_: CardValue, player: Player = None
-    ) -> None:
-        if type(type_) == str:
-            type_ = self._get_type_from_str(type_)
-        if type(value_) == str:
-            value_ = self._get_value_from_str(value_)
-        self.type: CardType = type_
-        self.value: CardValue = value_
+    def __init__(self, type: CardType, value: CardValue, player: Player = None) -> None:
+        if type.__class__ == str:
+            type = self._get_type_from_str(type)
+        if value.__class__ == str:
+            value = self._get_value_from_str(value)
+        self.type: CardType = type
+        self.value: CardValue = value
         self.played = False
         self.owner = player
 
@@ -71,14 +70,25 @@ class Card:
 
     def _get_value_from_str(self, str: str) -> CardValue:
         available_values = CardValue.__subclasses__()
-        filtered = [a for a in available_values if a.__name__ == str]
+        filtered = [a for a in available_values if a.__name__.lower() == str.lower()]
         if len(filtered):
             return filtered[0]
         raise BaseException(f"Unknown value for str {str}")
 
     def _get_type_from_str(self, str: str) -> CardType:
         available_values = CardType.__subclasses__()
-        filtered = [a for a in available_values if a.__name__ == str]
+        filtered = [a for a in available_values if a.__name__.lower() == str.lower()]
         if len(filtered):
             return filtered[0]
         raise BaseException(f"Unknown type for str {str}")
+
+    def to_json(self):
+        return {
+            "type": self.type.__name__.lower(),
+            "value": self.value.__name__.lower(),
+        }
+
+
+class CardFactory(Factory):
+    def from_json(self, args):
+        return Card(**args)

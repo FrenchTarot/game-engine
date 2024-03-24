@@ -1,8 +1,8 @@
 from typing import List
 
 from src.classes.Card import Card
-from src.types.CardType import Trump
-from src.types.CardValue import Fool
+from src.classes.CardType import Trump
+from src.classes.CardValue import Fool
 
 
 def get_playable_cards(owned_cards: List[Card], played_cards: List[Card]):

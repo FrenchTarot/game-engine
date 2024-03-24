@@ -48,3 +48,9 @@ class Result:
                 result.add_oudler(player, o)
 
         return result
+
+    def to_json(self):
+        return {
+            player.name: self.player_scores[player]
+            for player in self.player_scores.keys()
+        }

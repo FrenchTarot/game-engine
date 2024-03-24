@@ -1,3 +1,6 @@
+from src.classes.Factory import Factory
+
+
 class CardValue:
     rank = None
     is_oudler = False
@@ -139,3 +142,7 @@ class TwentyOne(CardValue):
     rank = 21
     is_oudler = True
     str = "21"
+
+
+class CardValueFactory(Factory):
+    available_classes = CardValue.__subclasses__()

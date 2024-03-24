@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
-from src.types.CardType import *
+from src.classes.CardType import *
 
 if TYPE_CHECKING:
     from src.classes.Player import Player
@@ -17,7 +17,7 @@ from src.utils.get_playable_cards import get_playable_cards
 
 
 class Player(Viewer):
-    def __init__(self, name) -> None:
+    def __init__(self, name: str) -> None:
         self.cards: List[Card] = []
         self.name = name
         self.set_dealer = None
@@ -41,7 +41,7 @@ class Player(Viewer):
 
     def tell_bid(self, current_bid: Bid) -> Bid:
         if not current_bid:
-            return Small()
+            return Small
         return None
 
     def tell_handful(self) -> Handful:
@@ -50,3 +50,15 @@ class Player(Viewer):
     def tell_card_to_play(self, current_turn_cards: List[Card]):
         playable_cards = get_playable_cards(self.cards, current_turn_cards)
         return random.choice(playable_cards)
+
+    def to_json(self):
+        return {
+            "name": self.name,
+        }
+
+
+class PlayerFactory(Factory):
+    def from_json(self, dict: Dict):
+        name = dict.get("name", "")
+
+        return Player(name)
